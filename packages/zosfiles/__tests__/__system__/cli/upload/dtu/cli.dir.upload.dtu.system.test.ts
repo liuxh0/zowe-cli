@@ -9,7 +9,7 @@
 *
 */
 
-import { Imperative, Session } from "@brightside/imperative";
+import { Imperative, Session } from "@zowe/imperative";
 import * as path from "path";
 import { runCliScript, getUniqueDatasetName } from "../../../../../../../__tests__/__src__/TestUtils";
 import { TestEnvironment } from "../../../../../../../__tests__/__src__/environment/TestEnvironment";
@@ -246,6 +246,34 @@ describe("Upload directory to USS", () => {
             expect(stdoutText).toContain("\"stdout\": \"success: true");
             expect(stdoutText).toContain(
                 "\"commandResponse\": \"Directory uploaded successfully.\"");
+        });
+
+        it("should upload local directory to USS directory with --max-concurrent-requests 2", async () => {
+            const localDirName = path.join(__dirname, "__data__", "command_upload_dtu_dir/command_upload_dtu_subdir_ascii");
+            const shellScript = path.join(__dirname, "__scripts__", "command", "command_upload_dtu.sh");
+            const response = runCliScript(shellScript, TEST_ENVIRONMENT,
+            [
+                localDirName,
+                ussname,
+                "--mcr 2"
+            ]);
+            expect(response.stderr.toString()).toBe("");
+            expect(response.status).toBe(0);
+            expect(response.stdout.toString()).toContain("Directory uploaded successfully.");
+        });
+
+        it("should upload local directory to USS directory with --max-concurrent-requests 0", async () => {
+            const localDirName = path.join(__dirname, "__data__", "command_upload_dtu_dir/command_upload_dtu_subdir_ascii");
+            const shellScript = path.join(__dirname, "__scripts__", "command", "command_upload_dtu.sh");
+            const response = runCliScript(shellScript, TEST_ENVIRONMENT,
+            [
+                localDirName,
+                ussname,
+                "--mcr 0"
+            ]);
+            expect(response.stderr.toString()).toBe("");
+            expect(response.status).toBe(0);
+            expect(response.stdout.toString()).toContain("Directory uploaded successfully.");
         });
     });
 });
